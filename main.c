@@ -25,9 +25,6 @@ int main(){
     }
     rewind(stream);
 
-    //Ke baris 1
-    fgets(line, 255, stream);
-
     latitude = malloc(sizeof(float)*jumlah_kota);
     longitude = malloc(sizeof(float)*jumlah_kota);
 
