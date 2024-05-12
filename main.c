@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 #include "variable.h"
 
 double calculate(float lat1, float lat2, float long1, float long2){
@@ -16,8 +17,41 @@ int seachIndex(){
     }
 }
 
-void ACO(){
-    printf("%d\n", seachIndex());
+double RandomNumberGenerator(){
+    srand(time(NULL));
+    int lower_bound = 1;
+    int upper_bound = 1000;
+    double val = (rand() % (upper_bound - lower_bound + 1) + lower_bound);
+
+    return val/1000.0;       
+}
+
+void ACO(int alpha, int beta, float evaporate, int iterasi){
+    
+    double pheromone[jumlah_kota][jumlah_kota];
+    for(int i=0; i<jumlah_kota; i++){
+        for(int j=0; j<jumlah_kota; j++){
+            if(i == j){
+                pheromone[i][j] = 0.0;
+            }
+            else{
+                pheromone[i][j] = 1.0;
+            }
+        }
+    }
+
+    for(int i=0; i<iterasi; i++){
+        for(int j=0; j<jumlah_kota; j++){
+            for(int k=0; k<jumlah_kota; k++){
+                if(j == k){
+                    continue;
+                }
+                else{
+                    pheromone[j][k] = pheromone[j][k] * pow(pheromone[j][k], alpha) * pow(1.0/adj[j][k], beta);
+                }
+            }
+        }
+    }
 }
 
 
@@ -76,6 +110,10 @@ int main(){
     printf("Masukkan Kota Awal: ");
     scanf("%s", kota_awal);     // Asumsi input selalu benar
 
-    ACO();
+    int alpha = 1;
+    int beta = 1;
+    float evaporate = 1;
+    int iterasi = 10;
+    ACO(alpha, beta, evaporate, iterasi);
 
 }
