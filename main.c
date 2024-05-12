@@ -8,6 +8,13 @@ double calculate(float lat1, float lat2, float long1, float long2){
     return 2.0*r*asin(sqrt(pow(sin(((lat2-lat1)/2.0)*(PI/180.0)),2)+((cos((lat1*PI)/180.0))*(cos((lat2*PI)/180.0))*pow(sin(((long2-long1)/2.0)*(PI/180.0)),2))));
 }
 
+void ACO(char *nama_kota[255], double**adj, char kota_awal[255]){
+    printf("%s\n", nama_kota[0]);
+    printf("%f\n", adj[0][1]);
+    printf("%s\n", kota_awal);
+}
+
+
 int main(){
     
     printf("Masukkan Nama File: ");
@@ -62,4 +69,6 @@ int main(){
 
     printf("Masukkan Kota Awal: ");
     scanf("%s", kota_awal);
+    ACO(nama_kota, adj, kota_awal);
+
 }
