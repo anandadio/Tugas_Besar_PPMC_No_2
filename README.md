@@ -1,4 +1,4 @@
-# Tugas_Besar_PPMC_No_2
+# Tugas Besar PPMC No2
 Mencari rute terpendek yang dapat dilalui dengan menggunakan berbagai algoritma.
 1. Greedy Algorithm
 2. Brute Force
