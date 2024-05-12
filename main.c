@@ -7,7 +7,7 @@
 double calculate(float lat1, float lat2, float long1, float long2){
     return 2.0*r*asin(sqrt(pow(sin(((lat2-lat1)/2.0)*(PI/180.0)),2)+((cos((lat1*PI)/180.0))*(cos((lat2*PI)/180.0))*pow(sin(((long2-long1)/2.0)*(PI/180.0)),2))));
 }
-shafi
+
 int main(){
     
     printf("Masukkan Nama File: ");
