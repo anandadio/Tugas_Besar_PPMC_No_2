@@ -9,7 +9,7 @@ double calculate(float lat1, float lat2, float long1, float long2){
 }
 
 int main(){
-    halo
+    
     printf("Masukkan Nama File: ");
     scanf("%s", namafile);
 
