@@ -23,7 +23,6 @@ int main(){
     while(fgets(line, 255, stream)){
         jumlah_kota++;
     }
-    jumlah_kota-=1;
     rewind(stream);
 
     //Ke baris 1
