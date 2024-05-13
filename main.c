@@ -26,6 +26,37 @@ double RandomNumberGenerator(){
     return val/1000.0;       
 }
 
+int faktorial(int n){
+    if(n == 1){
+        return (1);
+    }
+    else{
+        return (n * faktorial(n-1));
+    }
+}
+
+void path(int node, int source){
+    int max_cycle = faktorial(node-1);
+
+    // pengisian ujung dengan node awal
+    int jalur[max_cycle][node+1];
+    for(int i = 0; i < max_cycle; i++){
+        jalur[i][0] = source;   // start
+        jalur[i][node] = source; // finish
+    }
+    
+
+    for(int cycle=0; cycle<max_cycle; cycle++){
+        for(int index=1; index<=node; index++){
+            for(int isi = 1; isi<=node; isi++){
+                if(index != source && isi != source){
+
+                }   
+            }
+        }
+    }
+}
+
 void ACO(int alpha, int beta, float evaporate, int iterasi){
     
     double pheromone[jumlah_kota][jumlah_kota];
@@ -114,6 +145,8 @@ int main(){
     int beta = 1;
     float evaporate = 1;
     int iterasi = 10;
-    ACO(alpha, beta, evaporate, iterasi);
+    // ACO(alpha, beta, evaporate, iterasi);
+
+    path(4, 1);
 
 }
