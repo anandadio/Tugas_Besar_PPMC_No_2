@@ -18,7 +18,6 @@ int seachIndex(){
 }
 
 double RandomNumberGenerator(){
-    srand(time(NULL));
     int lower_bound = 1;
     int upper_bound = 1000;
     double val = (rand() % (upper_bound - lower_bound + 1) + lower_bound);
@@ -48,7 +47,8 @@ double probability(int alpha, int beta, double pheromone, double distance){
     return pow(pheromone, alpha) * pow(1.0/distance, beta);
 }
 
-void ACO(int alpha, int beta, float evaporate, int iterasi){
+void ACO(float alpha, float beta, float evaporate, int iterasi){
+    srand(time(NULL));
 
     double pheromone[jumlah_kota][jumlah_kota];
     for(int i=0; i<jumlah_kota; i++){
@@ -94,7 +94,7 @@ void ACO(int alpha, int beta, float evaporate, int iterasi){
                         continue;       // kota yang sudah dilewati
                     }
                     else{
-                        penyebut += pheromone[current][k]*(1.0/adj[current][k]);    // menjumlahkan semua penyebut
+                        penyebut += pow(pheromone[current][k],alpha)*pow((1.0/adj[current][k]),beta);    // menjumlahkan semua penyebut
                     }
                 }
 
@@ -104,7 +104,7 @@ void ACO(int alpha, int beta, float evaporate, int iterasi){
                         continue;       // kota yang sudah dilewati
                     }
                     else{
-                        probabilitas[k] = (pheromone[current][k]*(1.0/adj[current][k]))/penyebut;    // menghitung probabilitas tiap jalur
+                        probabilitas[k] = (pow(pheromone[current][k],alpha)*pow((1.0/adj[current][k]),beta))/penyebut;    // menghitung probabilitas tiap jalur
                     }
                 }
                 printf("pros\n");
@@ -215,12 +215,10 @@ int main(){
     printf("Masukkan Kota Awal: ");
     scanf("%s", kota_awal);     // Asumsi input selalu benar
 
-    int alpha = 1;
-    int beta = 1;
-    float evaporate = 1.0;
-    int iterasi = 120;
+    float alpha = 1;
+    float beta = 0.5;
+    float evaporate = 1.5;
+    int iterasi = 150;
 
     ACO(alpha, beta, evaporate, iterasi);
-    // printf("%f", RandomNumberGenerator());
-
 }
