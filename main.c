@@ -2,9 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 #include "variable.h"
+#include "bnb.c"
 
-double calculate(float lat1, float lat2, float long1, float long2){
+double calculate(double lat1, double lat2, double long1, double long2){
     return 2.0*r*asin(sqrt(pow(sin(((lat2-lat1)/2.0)*(PI/180.0)),2)+((cos((lat1*PI)/180.0))*(cos((lat2*PI)/180.0))*pow(sin(((long2-long1)/2.0)*(PI/180.0)),2))));
 }
 
@@ -25,8 +27,8 @@ int main(){
     }
     rewind(stream);
 
-    latitude = malloc(sizeof(float)*jumlah_kota);
-    longitude = malloc(sizeof(float)*jumlah_kota);
+    latitude = malloc(sizeof(double)*jumlah_kota);
+    longitude = malloc(sizeof(double)*jumlah_kota);
 
     //Parsing
     while(fgets(line, 255, stream)){
@@ -54,12 +56,38 @@ int main(){
             }
             else{
                 adj[i][j] = calculate(latitude[i],latitude[j],longitude[i],longitude[j]);
+                //debug
+                //printf("%.8lf\n",adj[i][j]);
             }
-            printf("%f |",adj[i][j]);
+            //debug
+            //printf("%lf |",adj[i][j]);
         }
-        printf("\n");
+        //printf("\n");
     }
 
+    //Varibel akhir
+    jalur_kota = malloc(sizeof(int)*(jumlah_kota+1));
+
+    //TSP
     printf("Masukkan Kota Awal: ");
     scanf("%s", kota_awal);
+    for(int i = 0; i<jumlah_kota;i++){
+        if(strcmp(kota_awal, nama_kota[i]) == 0){
+            indeks_kota = i;
+        }
+    }
+    clock_t start_time = clock();
+    TSP(adj, indeks_kota);
+    clock_t end_time = clock();
+    double elapsed_time = ((double) (end_time - start_time)) / CLOCKS_PER_SEC;
+
+    //Output Hasil
+    printf("Jalur terpendek: %f KM\n", jarak_total);
+    printf("Jalan yang diambil: ");
+    for (int i = 0; i <= jumlah_kota-1; i++){
+        printf("%s->", nama_kota[jalur_kota[i]]);
+    }
+    printf("%s", nama_kota[indeks_kota]);
+    printf("\n");
+    printf("Waktu komputasi: %.8lf seconds\n", elapsed_time);
 }

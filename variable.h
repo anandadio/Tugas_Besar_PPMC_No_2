@@ -7,8 +7,10 @@ char tempLine[255];
 char *token;
 int i = 0;
 char *nama_kota[255];
+char *endptr;
 float *latitude;
 float *longitude;
+int indeks_kota;    
 
 
 //Kalkulasi Jarak
@@ -17,3 +19,7 @@ float r = 6371.0;
 
 //Matrix adj graph jarak kota
 double **adj;
+
+//Jarak dan indeks jalur
+int *jalur_kota;
+double jarak_total;
