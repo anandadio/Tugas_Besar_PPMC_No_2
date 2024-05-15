@@ -14,6 +14,7 @@ int idx_tinjau;
 int jumlah_visited;
 double jarak_terdekat;
 int temp;
+int idx_awal;
 
 
 
