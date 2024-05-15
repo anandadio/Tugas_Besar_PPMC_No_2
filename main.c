@@ -124,9 +124,7 @@ int main() {
             else {
                 adj[i][j] = calculate(latitude[i], latitude[j], longitude[i], longitude[j]);
             }
-            printf("%f |", adj[i][j]);
         }
-        printf("\n");
     }
     int cek = -1;
     // Meminta input untuk kota awal
