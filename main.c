@@ -10,8 +10,12 @@ double calculate(float lat1, float lat2, float long1, float long2){
     return 2.0*r*asin(sqrt(pow(sin(((lat2-lat1)/2.0)*(PI/180.0)),2)+((cos((lat1*PI)/180.0))*(cos((lat2*PI)/180.0))*pow(sin(((long2-long1)/2.0)*(PI/180.0)),2))));
 }
 
-void tsp_greedy(int visited[]){
+void tsp_greedy(){
     //Greedy Algorithm
+    int visited[jumlah_kota];
+    for (int i = 0 ; i < jumlah_kota ; i ++){
+        visited[i] = 0;
+    }
     clock_t start, end;
     double cpu_time_used;
 
@@ -102,9 +106,7 @@ int main(){
         adj[i] = (double*)malloc(jumlah_kota * sizeof(double));
     }
 
-    int visited[jumlah_kota];
     for(int i = 0; i<jumlah_kota; i++){
-        visited[i] = 0;
         for(int j = 0; j<jumlah_kota; j++){
             if(i == j){
                 adj[i][j] = 0.0;
@@ -121,5 +123,5 @@ int main(){
     scanf("%s", kota_awal);
 
     //Greedy Algorithm
-    tsp_greedy(visited);
+    tsp_greedy();
 }
