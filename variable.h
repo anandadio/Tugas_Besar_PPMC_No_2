@@ -9,6 +9,13 @@ int i = 0;
 char *nama_kota[255];
 float *latitude;
 float *longitude;
+double jarak;
+int idx_tinjau;
+int jumlah_visited;
+double jarak_terdekat;
+int temp;
+
+
 
 
 //Kalkulasi Jarak
