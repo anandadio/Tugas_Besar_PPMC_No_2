@@ -61,9 +61,9 @@ int main(){
             else{
                 adj[i][j] = calculate(latitude[i],latitude[j],longitude[i],longitude[j]);
             }
-            //printf("%f |",adj[i][j]);
+            printf("%f |",adj[i][j]);
         }
-        //printf("\n");
+        printf("\n");
     }
 
     printf("Masukkan Kota Awal: ");
@@ -80,6 +80,7 @@ int main(){
         if (strcmp(nama_kota[i] , kota_awal) == 0){
             visited[i] = 1;
             idx_tinjau = i;
+            idx_awal = i;
             jumlah_visited++;
             printf("Best route found: \n");
             printf("%s -> " , nama_kota[i]);
@@ -111,6 +112,8 @@ int main(){
     end = clock();
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 
+
+    jarak += adj[idx_tinjau][idx_awal];
     printf("%s",kota_awal);
     printf("\nBest route distance: %f km" , jarak);
     printf("\nTime elapsed: %f s" , cpu_time_used);
