@@ -10,6 +10,57 @@ double calculate(float lat1, float lat2, float long1, float long2){
     return 2.0*r*asin(sqrt(pow(sin(((lat2-lat1)/2.0)*(PI/180.0)),2)+((cos((lat1*PI)/180.0))*(cos((lat2*PI)/180.0))*pow(sin(((long2-long1)/2.0)*(PI/180.0)),2))));
 }
 
+void tsp_greedy(int visited[]){
+    //Greedy Algorithm
+    clock_t start, end;
+    double cpu_time_used;
+
+    start = clock();
+
+    for (int i = 0 ; i < jumlah_kota ; i++){
+        //printf("\nnama kota: %s , kota awal : %s" , nama_kota[i], kota_awal);
+        if (strcmp(nama_kota[i] , kota_awal) == 0){
+            visited[i] = 1;
+            idx_tinjau = i;
+            idx_awal = i;
+            jumlah_visited++;
+            printf("Best route found: \n");
+            printf("%s -> " , nama_kota[i]);
+            break;
+        }
+    }
+    jarak = 0;
+
+    while (jumlah_visited < jumlah_kota)
+    {   
+        jarak_terdekat = 999999999999999;
+        temp = 0;
+        for (int i = 0 ; i<jumlah_kota ;i++){
+            //printf("\nidx tinjau: %d" , idx_tinjau);
+            //printf("\nadj : %f" , adj[idx_tinjau][i]);
+            //printf("\nvisited : %d\n" , visited[i]);
+            if((idx_tinjau != i)&&(adj[idx_tinjau][i] < jarak_terdekat)&& (visited[i] == 0)){
+                jarak_terdekat = adj[idx_tinjau][i];
+                temp = i;
+            }
+        }
+        printf("%s -> " , nama_kota[temp]);
+        idx_tinjau = temp;
+        jarak += jarak_terdekat;
+        visited[temp] = 1;
+    
+        jumlah_visited++;
+    }
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+
+    jarak += adj[idx_tinjau][idx_awal];
+    printf("%s",kota_awal);
+    printf("\nBest route distance: %f km" , jarak);
+    printf("\nTime elapsed: %f s" , cpu_time_used);
+}
+
 
 int main(){
     
@@ -70,51 +121,5 @@ int main(){
     scanf("%s", kota_awal);
 
     //Greedy Algorithm
-    clock_t start, end;
-    double cpu_time_used;
-
-    start = clock();
-
-    for (int i = 0 ; i < jumlah_kota ; i++){
-        //printf("\nnama kota: %s , kota awal : %s" , nama_kota[i], kota_awal);
-        if (strcmp(nama_kota[i] , kota_awal) == 0){
-            visited[i] = 1;
-            idx_tinjau = i;
-            idx_awal = i;
-            jumlah_visited++;
-            printf("Best route found: \n");
-            printf("%s -> " , nama_kota[i]);
-            break;
-        }
-    }
-    jarak = 0;
-
-    while (jumlah_visited < jumlah_kota)
-    {   
-        jarak_terdekat = 999999999999999;
-        temp = 0;
-        for (int i = 0 ; i<jumlah_kota ;i++){
-            //printf("\nidx tinjau: %d" , idx_tinjau);
-            //printf("\nadj : %f" , adj[idx_tinjau][i]);
-            //printf("\nvisited : %d\n" , visited[i]);
-            if((idx_tinjau != i)&&(adj[idx_tinjau][i] < jarak_terdekat)&& (visited[i] == 0)){
-                jarak_terdekat = adj[idx_tinjau][i];
-                temp = i;
-            }
-        }
-        printf("%s -> " , nama_kota[temp]);
-        idx_tinjau = temp;
-        jarak += jarak_terdekat;
-        visited[temp] = 1;
-    
-        jumlah_visited++;
-    }
-    end = clock();
-    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-
-
-    jarak += adj[idx_tinjau][idx_awal];
-    printf("%s",kota_awal);
-    printf("\nBest route distance: %f km" , jarak);
-    printf("\nTime elapsed: %f s" , cpu_time_used);
+    tsp_greedy(visited);
 }
