@@ -58,18 +58,16 @@ int main(){
             else{
                 adj[i][j] = calculate(latitude[i],latitude[j],longitude[i],longitude[j]);
             }
-            // printf("%f |",adj[i][j]);
         }
-        printf("\n");
     }
 
     printf("Masukkan Kota Awal: ");
     scanf("%s", kota_awal);     // Asumsi input selalu benar
 
     float alpha = 1.0;
-    float beta = 2.0;
-    float evaporate = 0.4;
-    int iterasi = 10000;
+    float beta = 1.5;
+    float evaporate = 0.5;
+    int iterasi = 1000;
 
     ACO(alpha, beta, evaporate, iterasi);
 }
