@@ -10,6 +10,14 @@ double calculate(float lat1, float lat2, float long1, float long2){
     return 2.0*r*asin(sqrt(pow(sin(((lat2-lat1)/2.0)*(PI/180.0)),2)+((cos((lat1*PI)/180.0))*(cos((lat2*PI)/180.0))*pow(sin(((long2-long1)/2.0)*(PI/180.0)),2))));
 }
 
+int cekKota(){
+    for(int i=0; i<jumlah_kota; i++){
+        if(strcmp(kota_awal, nama_kota[i]) == 0){
+            return 1;
+        }
+    }
+    return 0;
+}
 
 int main(){
     
@@ -63,6 +71,12 @@ int main(){
 
     printf("Masukkan Kota Awal: ");
     scanf("%s", kota_awal);     // Asumsi input selalu benar
+    while(!cekKota()){
+        printf("-----------------------\n");
+        printf("Kota tidak ditemukan !!!\n");
+        printf("Masukkan Kota Awal: ");
+        scanf("%s", kota_awal);
+    }
 
     float alpha = 1.0;
     float beta = 1.5;
