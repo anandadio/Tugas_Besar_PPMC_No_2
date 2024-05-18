@@ -40,7 +40,7 @@ double calculateTotalDistance(int *route, int n) {
     return totalDistance;
 }
 
-void initializeSwarm() {
+void initializeSwarm(int startIdx) {
     swarm = (Particle *) malloc(sizeof(Particle) * swarmSize);
     gbestRoute = (int *) malloc(sizeof(int) * jumlah_kota);
     gbestFitness = INFINITY;
@@ -51,11 +51,21 @@ void initializeSwarm() {
         for (int j = 0; j < jumlah_kota; j++) {
             swarm[i].route[j] = j;
         }
-        for (int j = 0; j < jumlah_kota; j++) {
-            int swapIdx = rand() % jumlah_kota;
+        // Shuffle using Fisher-Yates algorithm
+        for (int j = jumlah_kota - 1; j > 0; j--) {
+            int k = rand() % (j + 1);
             int temp = swarm[i].route[j];
-            swarm[i].route[j] = swarm[i].route[swapIdx];
-            swarm[i].route[swapIdx] = temp;
+            swarm[i].route[j] = swarm[i].route[k];
+            swarm[i].route[k] = temp;
+        }
+        // Ensure the starting point is correct
+        for (int j = 0; j < jumlah_kota; j++) {
+            if (swarm[i].route[j] == startIdx) {
+                int temp = swarm[i].route[0];
+                swarm[i].route[0] = swarm[i].route[j];
+                swarm[i].route[j] = temp;
+                break;
+            }
         }
         swarm[i].fitness = calculateTotalDistance(swarm[i].route, jumlah_kota);
         memcpy(swarm[i].pbestRoute, swarm[i].route, sizeof(int) * jumlah_kota);
@@ -89,8 +99,6 @@ void updateParticles() {
 int main() {
     printf("Enter list of cities file name: ");
     scanf("%s", namafile);
-    printf("Enter starting point: ");
-    scanf("%s", kota_awal);
 
     FILE *stream = fopen(namafile, "r");
     if (stream == NULL) {
@@ -113,6 +121,10 @@ int main() {
 
     i = 0;
     while (fgets(line, 255, stream)) {
+    // Menghapus BOM jika ditemukan di baris pertama
+        if (i == 0 && line[0] == '\xEF' && line[1] == '\xBB' && line[2] == '\xBF') {
+        memmove(line, line + 3, strlen(line) - 3 + 1);
+        }
         strcpy(tempLine, line);
         token = strtok(tempLine, ",");
         nama_kota[i] = (char *) malloc(strlen(token) + 1);
@@ -135,15 +147,29 @@ int main() {
     }
 
     fclose(stream);
+    printf("Enter starting point: ");
+    scanf("%s", kota_awal);
+    int startIdx = -1;
+    for(int j = 0; j < jumlah_kota; j++){
+        if(strcmp(nama_kota[j], kota_awal) == 0){ // Menggunakan strcmp() untuk membandingkan string
+        startIdx = j;
+        break; // Keluar dari loop jika kota ditemukan
+        }
+   }
+
+    if (startIdx == -1) {
+        printf("Kota awal tidak ditemukan dalam daftar.\n");
+        return 0;
+    }
 
     // Initialize and run PSO
-    clock_t start_time = clock();
-    initializeSwarm();
-    for (int iter = 0; iter < maxIterations; iter++) {
+    clock_t start = clock();
+    initializeSwarm(startIdx);
+    for (int i = 0; i < maxIterations; i++) {
         updateParticles();
     }
-    clock_t end_time = clock();
-    double time_elapsed = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+    clock_t end = clock();
+    double time_elapsed = (double)(end - start) / CLOCKS_PER_SEC;
 
     printf("Best route found: ");
     for (int i = 0; i < jumlah_kota; i++) {
