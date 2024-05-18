@@ -26,12 +26,16 @@ double RandomNumberGenerator(){
     return val/1000.0;       
 }
 
-int faktorial(int n){
-    if(n == 1){
-        return (1);
-    }
-    else{
-        return (n * faktorial(n-1));
+void pheromoneMaking(double pheromone[jumlah_kota][jumlah_kota]){
+    for(int i=0; i<jumlah_kota; i++){
+        for(int j=0; j<jumlah_kota; j++){
+            if(i == j){
+                pheromone[i][j] = 0.0;
+            }
+            else{
+                pheromone[i][j] = 1.0;
+            }
+        }
     }
 }
 
@@ -105,6 +109,22 @@ void updatePheromone(double pheromone[jumlah_kota][jumlah_kota], int path[jumlah
     }
 }
 
+int checkPath(int path[jumlah_kota]){
+    for(int i=0; i<jumlah_kota; i++){
+        int jumlah = 0;
+        for(int j=0; j<jumlah_kota; j++){
+            if(path[j] == i){
+                jumlah++;
+            }
+        }
+        if(jumlah > 1){
+            return 0;   // jika ada kota yang dilewati lebih dari 1 kali
+        }
+    }
+
+    return 1;   // jika semua kota tepat dilewati 1 kali
+}
+
 void printPath(int shortestPath[jumlah_kota], double shortestDistance, int kotaAsal){
     printf("%s ", nama_kota[kotaAsal]);
     for(int j=0; j<jumlah_kota; j++){
@@ -118,26 +138,18 @@ void ACO(float alpha, float beta, float evaporate, int iterasi){
     srand(time(NULL));
 
     double pheromone[jumlah_kota][jumlah_kota];
-    for(int i=0; i<jumlah_kota; i++){
-        for(int j=0; j<jumlah_kota; j++){
-            if(i == j){
-                pheromone[i][j] = 0.0;
-            }
-            else{
-                pheromone[i][j] = 1.0;
-            }
-        }
-    }
+    pheromoneMaking(pheromone);
 
 
     int node[jumlah_kota];
     int path[jumlah_kota];
     double probabilitas[jumlah_kota];
-    int kotaAsal = seachIndex();
     int current;
     int destination;
     double shortestDistance = 999999999999999.0;
     int shortestPath[jumlah_kota];
+    int kotaAsal = seachIndex();    // mencari index dari kota awal yang diinputkan
+
     for(int i=0; i<iterasi; i++){
         // pengisian node dengan index kota
         for(int j=0; j<jumlah_kota; j++){
@@ -167,7 +179,8 @@ void ACO(float alpha, float beta, float evaporate, int iterasi){
             updateDistance(node, &current, path, &totalDistance, destination, j);
         }
 
-        if(totalDistance < shortestDistance){
+        
+        if(totalDistance < shortestDistance && checkPath(path) == 1){
             shortestDistance = totalDistance;
             for(int j=0; j<jumlah_kota; j++){
                 shortestPath[j] = path[j];
@@ -183,5 +196,4 @@ void ACO(float alpha, float beta, float evaporate, int iterasi){
     clock_t end = clock();
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
     printf("Time elapsed: %f s\n", time_spent);
-
 }
