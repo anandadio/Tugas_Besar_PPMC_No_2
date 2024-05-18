@@ -139,7 +139,7 @@ int main() {
     // Initialize and run PSO
     clock_t start_time = clock();
     initializeSwarm();
-    for (int i = 0; i < maxIterations; i++) {
+    for (int iter = 0; iter < maxIterations; iter++) {
         updateParticles();
     }
     clock_t end_time = clock();
