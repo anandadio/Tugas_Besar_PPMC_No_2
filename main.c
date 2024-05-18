@@ -21,7 +21,7 @@ int maxIterations = 1000;
 
 // Function declarations
 double calculate(float lat1, float lat2, float long1, float long2);
-void initializeSwarm();
+void initializeSwarm(int startIdx);
 void updateParticles();
 double calculateTotalDistance(int *route, int n);
 
@@ -48,28 +48,38 @@ void initializeSwarm(int startIdx) {
     for (int i = 0; i < swarmSize; i++) {
         swarm[i].route = (int *) malloc(sizeof(int) * jumlah_kota);
         swarm[i].pbestRoute = (int *) malloc(sizeof(int) * jumlah_kota);
+        
+        // Initialize the route with all cities
         for (int j = 0; j < jumlah_kota; j++) {
             swarm[i].route[j] = j;
         }
-        // Shuffle using Fisher-Yates algorithm
-        for (int j = jumlah_kota - 1; j > 0; j--) {
-            int k = rand() % (j + 1);
+
+        // Ensure the starting point is correct
+        if (swarm[i].route[0] != startIdx) {
+            for (int j = 0; j < jumlah_kota; j++) {
+                if (swarm[i].route[j] == startIdx) {
+                    int temp = swarm[i].route[0];
+                    swarm[i].route[0] = swarm[i].route[j];
+                    swarm[i].route[j] = temp;
+                    break;
+                }
+            }
+        }
+
+        // Shuffle the rest of the cities (Fisher-Yates shuffle)
+        for (int j = jumlah_kota - 1; j > 1; j--) {
+            int k = 1 + rand() % j; // start shuffling from the second element
             int temp = swarm[i].route[j];
             swarm[i].route[j] = swarm[i].route[k];
             swarm[i].route[k] = temp;
         }
-        // Ensure the starting point is correct
-        for (int j = 0; j < jumlah_kota; j++) {
-            if (swarm[i].route[j] == startIdx) {
-                int temp = swarm[i].route[0];
-                swarm[i].route[0] = swarm[i].route[j];
-                swarm[i].route[j] = temp;
-                break;
-            }
-        }
+
+        // Calculate the fitness for the initial route
         swarm[i].fitness = calculateTotalDistance(swarm[i].route, jumlah_kota);
         memcpy(swarm[i].pbestRoute, swarm[i].route, sizeof(int) * jumlah_kota);
         swarm[i].pbestFitness = swarm[i].fitness;
+
+        // Update global best if necessary
         if (swarm[i].fitness < gbestFitness) {
             gbestFitness = swarm[i].fitness;
             memcpy(gbestRoute, swarm[i].route, sizeof(int) * jumlah_kota);
@@ -79,11 +89,13 @@ void initializeSwarm(int startIdx) {
 
 void updateParticles() {
     for (int i = 0; i < swarmSize; i++) {
-        int swapA = rand() % jumlah_kota;
-        int swapB = rand() % jumlah_kota;
+        // Swap two random cities in the route, but ensure the starting city stays at index 0
+        int swapA = 1 + rand() % (jumlah_kota - 1);
+        int swapB = 1 + rand() % (jumlah_kota - 1);
         int temp = swarm[i].route[swapA];
         swarm[i].route[swapA] = swarm[i].route[swapB];
         swarm[i].route[swapB] = temp;
+
         swarm[i].fitness = calculateTotalDistance(swarm[i].route, jumlah_kota);
         if (swarm[i].fitness < swarm[i].pbestFitness) {
             memcpy(swarm[i].pbestRoute, swarm[i].route, sizeof(int) * jumlah_kota);
@@ -99,6 +111,7 @@ void updateParticles() {
 int main() {
     printf("Enter list of cities file name: ");
     scanf("%s", namafile);
+    getchar(); // Clear the newline character left by scanf
 
     FILE *stream = fopen(namafile, "r");
     if (stream == NULL) {
@@ -107,6 +120,7 @@ int main() {
     }
 
     // Mencari Jumlah Kota
+    jumlah_kota = 0;
     while (fgets(line, 255, stream)) {
         jumlah_kota++;
     }
@@ -121,9 +135,9 @@ int main() {
 
     i = 0;
     while (fgets(line, 255, stream)) {
-    // Menghapus BOM jika ditemukan di baris pertama
+        // Menghapus BOM jika ditemukan
         if (i == 0 && line[0] == '\xEF' && line[1] == '\xBB' && line[2] == '\xBF') {
-        memmove(line, line + 3, strlen(line) - 3 + 1);
+            memmove(line, line + 3, strlen(line) - 3 + 1);
         }
         strcpy(tempLine, line);
         token = strtok(tempLine, ",");
@@ -147,15 +161,21 @@ int main() {
     }
 
     fclose(stream);
+
+    // Menggunakan fgets untuk membaca input kota awal
     printf("Enter starting point: ");
-    scanf("%s", kota_awal);
+    fgets(kota_awal, sizeof(kota_awal), stdin);
+    
+    // Menghilangkan newline character dari input
+    kota_awal[strcspn(kota_awal, "\n")] = 0;
+
     int startIdx = -1;
-    for(int j = 0; j < jumlah_kota; j++){
-        if(strcmp(nama_kota[j], kota_awal) == 0){ // Menggunakan strcmp() untuk membandingkan string
-        startIdx = j;
-        break; // Keluar dari loop jika kota ditemukan
+    for (int j = 0; j < jumlah_kota; j++) {
+        if (strcmp(nama_kota[j], kota_awal) == 0) { // Menggunakan strcmp() untuk membandingkan string
+            startIdx = j;
+            break; // Keluar dari loop jika kota ditemukan
         }
-   }
+    }
 
     if (startIdx == -1) {
         printf("Kota awal tidak ditemukan dalam daftar.\n");
