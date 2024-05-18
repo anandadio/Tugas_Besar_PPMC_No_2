@@ -48,7 +48,7 @@ void initializeSwarm(int startIdx) {
     for (int i = 0; i < swarmSize; i++) {
         swarm[i].route = (int *) malloc(sizeof(int) * jumlah_kota);
         swarm[i].pbestRoute = (int *) malloc(sizeof(int) * jumlah_kota);
-        
+
         // Initialize the route with all cities
         for (int j = 0; j < jumlah_kota; j++) {
             swarm[i].route[j] = j;
@@ -89,12 +89,23 @@ void initializeSwarm(int startIdx) {
 
 void updateParticles() {
     for (int i = 0; i < swarmSize; i++) {
-        // Swap two random cities in the route, but ensure the starting city stays at index 0
+        // 2-opt swap to explore the neighborhood
         int swapA = 1 + rand() % (jumlah_kota - 1);
         int swapB = 1 + rand() % (jumlah_kota - 1);
-        int temp = swarm[i].route[swapA];
-        swarm[i].route[swapA] = swarm[i].route[swapB];
-        swarm[i].route[swapB] = temp;
+        if (swapA > swapB) {
+            int temp = swapA;
+            swapA = swapB;
+            swapB = temp;
+        }
+
+        // Reverse the order of the nodes between swapA and swapB
+        while (swapA < swapB) {
+            int temp = swarm[i].route[swapA];
+            swarm[i].route[swapA] = swarm[i].route[swapB];
+            swarm[i].route[swapB] = temp;
+            swapA++;
+            swapB--;
+        }
 
         swarm[i].fitness = calculateTotalDistance(swarm[i].route, jumlah_kota);
         if (swarm[i].fitness < swarm[i].pbestFitness) {
