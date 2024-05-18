@@ -5,41 +5,63 @@
 #include <time.h>
 #include "variable.h"
 
-// PSO Structures and Definitions
+// Struktur dan Definisi PSO
 typedef struct {
-    int *route;
-    double fitness;
-    int *pbestRoute;
-    double pbestFitness;
+    int *route; // Rute yang diambil oleh partikel
+    double fitness; // Nilai fitness dari rute
+    int *pbestRoute; // Rute terbaik pribadi partikel
+    double pbestFitness; // Nilai fitness terbaik pribadi partikel
 } Particle;
 
-Particle *swarm;
-double gbestFitness;
-int *gbestRoute;
-int swarmSize = 50;
-int maxIterations = 1000;
+Particle *swarm; // Array partikel dalam swarm
+double gbestFitness; // Nilai fitness terbaik global
+int *gbestRoute; // Rute terbaik global
+int swarmSize = 50; // Ukuran swarm
+int maxIterations = 1000; // Jumlah iterasi maksimal
 
-// Function declarations
+// Deklarasi fungsi
 double calculate(float lat1, float lat2, float long1, float long2);
 void initializeSwarm(int startIdx);
 void updateParticles();
+void twoOptSwap(int *route, int n);
 double calculateTotalDistance(int *route, int n);
 
+// Fungsi untuk menghitung jarak antara dua koordinat
 double calculate(float lat1, float lat2, float long1, float long2) {
     return 2.0 * r * asin(sqrt(pow(sin(((lat2 - lat1) / 2.0) * (PI / 180.0)), 2) + 
                (cos((lat1 * PI) / 180.0) * cos((lat2 * PI) / 180.0) * 
                pow(sin(((long2 - long1) / 2.0) * (PI / 180.0)), 2))));
 }
 
+// Fungsi untuk menghitung total jarak dari suatu rute
 double calculateTotalDistance(int *route, int n) {
     double totalDistance = 0.0;
     for (int i = 0; i < n - 1; i++) {
         totalDistance += adj[route[i]][route[i + 1]];
     }
-    totalDistance += adj[route[n - 1]][route[0]]; // Return to start
+    totalDistance += adj[route[n - 1]][route[0]]; // Kembali ke titik awal
     return totalDistance;
 }
 
+// Fungsi untuk melakukan 2-opt swap pada rute
+void twoOptSwap(int *route, int n) {
+    int i = 1 + rand() % (n - 1);
+    int j = 1 + rand() % (n - 1);
+    if (i > j) {
+        int temp = i;
+        i = j;
+        j = temp;
+    }
+    while (i < j) {
+        int temp = route[i];
+        route[i] = route[j];
+        route[j] = temp;
+        i++;
+        j--;
+    }
+}
+
+// Fungsi untuk menginisialisasi swarm
 void initializeSwarm(int startIdx) {
     swarm = (Particle *) malloc(sizeof(Particle) * swarmSize);
     gbestRoute = (int *) malloc(sizeof(int) * jumlah_kota);
@@ -49,12 +71,12 @@ void initializeSwarm(int startIdx) {
         swarm[i].route = (int *) malloc(sizeof(int) * jumlah_kota);
         swarm[i].pbestRoute = (int *) malloc(sizeof(int) * jumlah_kota);
 
-        // Initialize the route with all cities
+        // Inisialisasi rute dengan semua kota
         for (int j = 0; j < jumlah_kota; j++) {
             swarm[i].route[j] = j;
         }
 
-        // Ensure the starting point is correct
+        // Pastikan titik awal benar
         if (swarm[i].route[0] != startIdx) {
             for (int j = 0; j < jumlah_kota; j++) {
                 if (swarm[i].route[j] == startIdx) {
@@ -66,20 +88,20 @@ void initializeSwarm(int startIdx) {
             }
         }
 
-        // Shuffle the rest of the cities (Fisher-Yates shuffle)
+        // Acak urutan kota lainnya (Fisher-Yates shuffle)
         for (int j = jumlah_kota - 1; j > 1; j--) {
-            int k = 1 + rand() % j; // start shuffling from the second element
+            int k = 1 + rand() % j; // Mulai acak dari elemen kedua
             int temp = swarm[i].route[j];
             swarm[i].route[j] = swarm[i].route[k];
             swarm[i].route[k] = temp;
         }
 
-        // Calculate the fitness for the initial route
+        // Hitung nilai fitness untuk rute awal
         swarm[i].fitness = calculateTotalDistance(swarm[i].route, jumlah_kota);
         memcpy(swarm[i].pbestRoute, swarm[i].route, sizeof(int) * jumlah_kota);
         swarm[i].pbestFitness = swarm[i].fitness;
 
-        // Update global best if necessary
+        // Perbarui global best jika perlu
         if (swarm[i].fitness < gbestFitness) {
             gbestFitness = swarm[i].fitness;
             memcpy(gbestRoute, swarm[i].route, sizeof(int) * jumlah_kota);
@@ -87,25 +109,11 @@ void initializeSwarm(int startIdx) {
     }
 }
 
+// Fungsi untuk memperbarui partikel dalam swarm
 void updateParticles() {
     for (int i = 0; i < swarmSize; i++) {
-        // 2-opt swap to explore the neighborhood
-        int swapA = 1 + rand() % (jumlah_kota - 1);
-        int swapB = 1 + rand() % (jumlah_kota - 1);
-        if (swapA > swapB) {
-            int temp = swapA;
-            swapA = swapB;
-            swapB = temp;
-        }
-
-        // Reverse the order of the nodes between swapA and swapB
-        while (swapA < swapB) {
-            int temp = swarm[i].route[swapA];
-            swarm[i].route[swapA] = swarm[i].route[swapB];
-            swarm[i].route[swapB] = temp;
-            swapA++;
-            swapB--;
-        }
+        // 2-opt swap untuk mengeksplorasi lingkungan
+        twoOptSwap(swarm[i].route, jumlah_kota);
 
         swarm[i].fitness = calculateTotalDistance(swarm[i].route, jumlah_kota);
         if (swarm[i].fitness < swarm[i].pbestFitness) {
@@ -120,9 +128,10 @@ void updateParticles() {
 }
 
 int main() {
+    // Meminta pengguna memasukkan nama file daftar kota
     printf("Enter list of cities file name: ");
     scanf("%s", namafile);
-    getchar(); // Clear the newline character left by scanf
+    getchar(); // Menghilangkan karakter newline yang tertinggal oleh scanf
 
     FILE *stream = fopen(namafile, "r");
     if (stream == NULL) {
@@ -130,7 +139,7 @@ int main() {
         return 0;
     }
 
-    // Mencari Jumlah Kota
+    // Mencari jumlah kota
     jumlah_kota = 0;
     while (fgets(line, 255, stream)) {
         jumlah_kota++;
@@ -177,7 +186,7 @@ int main() {
     printf("Enter starting point: ");
     fgets(kota_awal, sizeof(kota_awal), stdin);
     
-    // Menghilangkan newline character dari input
+    // Menghilangkan karakter newline dari input
     kota_awal[strcspn(kota_awal, "\n")] = 0;
 
     int startIdx = -1;
@@ -193,7 +202,7 @@ int main() {
         return 0;
     }
 
-    // Initialize and run PSO
+    // Inisialisasi dan jalankan PSO
     clock_t start = clock();
     initializeSwarm(startIdx);
     for (int i = 0; i < maxIterations; i++) {
@@ -202,11 +211,12 @@ int main() {
     clock_t end = clock();
     double time_elapsed = (double)(end - start) / CLOCKS_PER_SEC;
 
+    // Menampilkan rute terbaik yang ditemukan
     printf("Best route found: ");
     for (int i = 0; i < jumlah_kota; i++) {
         printf("%s -> ", nama_kota[gbestRoute[i]]);
     }
-    printf("%s\n", nama_kota[gbestRoute[0]]); // complete the route by returning to the start
+    printf("%s\n", nama_kota[gbestRoute[0]]); // Menyelesaikan rute dengan kembali ke awal
     printf("Best route distance: %.5f km\n", gbestFitness);
     printf("Time elapsed: %.10f s\n", time_elapsed);
 
