@@ -70,7 +70,7 @@ int main(){
     }
 
     printf("Masukkan Kota Awal: ");
-    scanf("%s", kota_awal);     // Asumsi input selalu benar
+    scanf("%s", kota_awal);    
     while(!cekKota()){
         printf("-----------------------\n");
         printf("Kota tidak ditemukan !!!\n");
