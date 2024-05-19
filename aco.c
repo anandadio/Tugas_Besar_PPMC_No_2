@@ -138,7 +138,7 @@ void ACO(float alpha, float beta, float evaporate, int iterasi){
     srand(time(NULL));
 
     double pheromone[jumlah_kota][jumlah_kota];
-    pheromoneMaking(pheromone);
+    pheromoneMaking(pheromone);     // membuat matriks pheromone
 
 
     int node[jumlah_kota];
@@ -156,12 +156,12 @@ void ACO(float alpha, float beta, float evaporate, int iterasi){
             node[j] = j;
             path[j] = 0;
         }
-        node[kotaAsal] = -1;
+        node[kotaAsal] = -1;        // mengeliminasi kota awal
         int current = kotaAsal;
         double totalDistance = 0.0;
         for(int j=0; j<jumlah_kota; j++){
             for(int k=0; k<jumlah_kota; k++){
-                probabilitas[k] = 0.0;
+                probabilitas[k] = 0.0;      // mengisi array probabilitas dengan 0
             }
 
             if(j == jumlah_kota-1){
@@ -171,7 +171,7 @@ void ACO(float alpha, float beta, float evaporate, int iterasi){
                 // menghitung probabilitas tiap jalur
                 menentukanProbabilitas(probabilitas, node, pheromone, current, alpha, beta);
 
-                // memilih jalur yang tersedia
+                // memilih jalur yang tersedia sesuai dengan probabilitas
                 memilihJalur(node, probabilitas, &destination);
             }
 
@@ -179,7 +179,7 @@ void ACO(float alpha, float beta, float evaporate, int iterasi){
             updateDistance(node, &current, path, &totalDistance, destination, j);
         }
 
-        
+        // jika ditemukan jalur terpendek
         if(totalDistance < shortestDistance && checkPath(path) == 1){
             shortestDistance = totalDistance;
             for(int j=0; j<jumlah_kota; j++){
@@ -191,8 +191,10 @@ void ACO(float alpha, float beta, float evaporate, int iterasi){
 
     }
     
+    // mencetak kota yang dilewati berdasarkan jarak terpendek
     printPath(shortestPath, shortestDistance, kotaAsal);
     
+    // mencetak waktu yang dibutuhkan untuk mendapatkan hasil jalur terpendek
     clock_t end = clock();
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
     printf("Time elapsed: %f s\n", time_spent);
