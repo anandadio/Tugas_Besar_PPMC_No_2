@@ -10,7 +10,7 @@ extern double jarak_total;
 
 // Variabel global
 double final_res = INT_MAX;
-double epsilon = 1e-12;
+double epsilon = 1e-9;
 
 // Fungsi menyalin jalur yang ditempuh
 void copyToFinal(int curr_path[],int final_path[]) {
@@ -22,9 +22,10 @@ void copyToFinal(int curr_path[],int final_path[]) {
 // Fungsi mencari jalur minimun ke-1 dari node i
 double firstMin(double **adj, int i) {
     double min = INT_MAX;
-    for (int k = 0; k < jumlah_kota; k++)
+    for (int k = 0; k < jumlah_kota; k++){
         if (adj[i][k] < min && i != k)
             min = adj[i][k];
+    }
     return min;
 }
 
@@ -46,15 +47,15 @@ double secondMin(double **adj, int i) {
 }
 
 // Fungsi rekursi TSP
-void TSPRec(double **adj, double curr_bound, double curr_weight, int level, int curr_path[], int visited[], int final_path[]) {
+void Rec(double **adj, double curr_bound, double curr_weight, int level, int curr_path[], int visited[], int final_path[]) {
     if (level == jumlah_kota) { // Sudah mencapai level akhir, leaf
         //debug
         //printf("Halo level4\n");
         if (adj[curr_path[level-1]][curr_path[0]] != 0) { // Mengecek kevalidan jalur kembali ke node awal
             double curr_res = curr_weight + adj[curr_path[level-1]][curr_path[0]];
-            if (curr_res < final_res - epsilon) {
+            if (curr_res < final_res-epsilon) {
                 //debug
-                //printf("berat yes, %lf\n",curr_res);
+                //printf("berat = %lf\n",curr_res);
                 copyToFinal(curr_path, final_path);
                 final_res = curr_res;
             }
@@ -80,12 +81,12 @@ void TSPRec(double **adj, double curr_bound, double curr_weight, int level, int 
                 curr_bound -= ((secondMin(adj, curr_path[level-1]) + firstMin(adj, i)) / 2.0);
             }
             //Melanjutkan search, lanjut ke node selanjutnya
-            if (curr_bound + curr_weight < final_res - epsilon) {
+            if ((curr_bound + adj[curr_path[level-1]][i]) < final_res-epsilon) {
                 //debug
                 //printf("to node:%d\n",i);
                 curr_path[level] = i;
                 visited[i] = 1;
-                TSPRec(adj, curr_bound, curr_weight, level + 1, curr_path, visited, final_path);
+                Rec(adj, curr_bound, curr_weight, level + 1, curr_path, visited, final_path);
             }
 
             //Tidak melanjutkan search, reset
@@ -94,6 +95,9 @@ void TSPRec(double **adj, double curr_bound, double curr_weight, int level, int 
             //debug
             //printf("back\n");
             memset(visited, 0, jumlah_kota * sizeof(int));
+            //for (int j = 0; j < jumlah_kota; j++) {
+                //visited[j] = 0;
+            //}
             for (int j = 0; j <= level - 1; j++)
                 visited[curr_path[j]] = 1;
         }
@@ -101,7 +105,7 @@ void TSPRec(double **adj, double curr_bound, double curr_weight, int level, int 
 }
 
 // Fungsi utama
-void TSP(double **adj, int indeks_kota) {
+void BNB(double **adj, int indeks_kota) {
     int *curr_path = (int*)malloc((jumlah_kota+1)*sizeof(int));
     int *final_path = (int*)malloc((jumlah_kota+1)*sizeof(int));
     int *visited = (int*)malloc((jumlah_kota)*sizeof(int));
@@ -117,7 +121,7 @@ void TSP(double **adj, int indeks_kota) {
     visited[indeks_kota] = 1;
     curr_path[0] = indeks_kota;
 
-    TSPRec(adj, curr_bound, 0.0, 1, curr_path, visited, final_path);
+    Rec(adj, curr_bound, 0.0, 1, curr_path, visited, final_path);
     jarak_total = final_res;
     jalur_kota = final_path;
 }
