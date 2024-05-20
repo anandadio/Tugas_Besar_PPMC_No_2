@@ -21,6 +21,7 @@ void tsp_greedy(){
 
     start = clock();
 
+    int ada = 0 ;
     for (int i = 0 ; i < jumlah_kota ; i++){
         //printf("\nnama kota: %s , kota awal : %s" , nama_kota[i], kota_awal);
         if (strcmp(nama_kota[i] , kota_awal) == 0){
@@ -30,8 +31,14 @@ void tsp_greedy(){
             jumlah_visited++;
             printf("Best route found: \n");
             printf("%s -> " , nama_kota[i]);
+            ada = 1;
             break;
         }
+    }
+    
+    if (ada == 0){
+        printf("Kota %s bukan merupakan kota yang ingin dikunjungi" , kota_awal);
+        return;
     }
     jarak = 0;
 
