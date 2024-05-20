@@ -6,19 +6,19 @@
 #include <time.h>
 #include "variable.h"
 
-#define N 100 // Misalkan jumlah kota maksimum adalah 100
+#define N 15
 
 double calculate(float lat1, float lat2, float long1, float long2) {
     return 2.0 * r * asin(sqrt(pow(sin(((lat2 - lat1) / 2.0) * (PI / 180.0)), 2) + ((cos((lat1 * PI) / 180.0)) * (cos((lat2 * PI) / 180.0)) * pow(sin(((long2 - long1) / 2.0) * (PI / 180.0)), 2))));
 }
 
-void Menemukan_rute(double graph[N][N], int curr_path[], double curr_cost, int visited[], int level, double* rute_minimun, int final_path[], int start) {
+void Menemukan_rute(double graph[N][N], int curr_path[], double temp, int visited[], int level, double* rute_minimun, int final_path[], int start) {
     if (level == jumlah_kota) {
-        // Menambahkan biaya kembali ke kota awal
-        curr_cost += graph[curr_path[level - 1]][curr_path[0]];
+        // Menambahkan jarak kembali kembali ke kota awal
+        temp += graph[curr_path[level - 1]][curr_path[0]];
         // Memperbarui jalur terpendek jika ditemukan
-        if (curr_cost <= *rute_minimun) {
-            *rute_minimun = curr_cost;
+        if (temp <= *rute_minimun) {
+            *rute_minimun = temp;
             for (int i = 0; i < jumlah_kota; i++) {
                 final_path[i] = curr_path[i];
             }
@@ -27,23 +27,23 @@ void Menemukan_rute(double graph[N][N], int curr_path[], double curr_cost, int v
     }
 
     for (int i = 0; i < jumlah_kota; i++) {
-        if (!visited[i]) {
+        if (visited[i]!= 1) {
             visited[i] = 1;
             curr_path[level] = i;
             double jarak_tambahan = graph[curr_path[level - 1]][curr_path[level]];
             // Memanggil fungsi rekursif untuk level berikutnya
-            Menemukan_rute(graph, curr_path, curr_cost + jarak_tambahan, visited, level + 1, rute_minimun, final_path, start);
+            Menemukan_rute(graph, curr_path, temp + jarak_tambahan, visited, level + 1, rute_minimun, final_path, start);
             // Backtracking
             visited[i] = 0;
         }
     }
 }
 
-void Menghitung_jarak_terpendek(double graph[N][N], int start) {
+void Print_rute(double graph[N][N], int start) {
     int curr_path[N];
     int visited[N];
     int final_path[N];
-    double min_cost = INFINITY; // Gunakan INFINITY dari float.h untuk inisialisasi biaya minimum
+    double min = INFINITY; // Gunakan INFINITY dari float.h untuk inisialisasi biaya minimum
 
     // Inisialisasi array visited
     for (int i = 0; i < jumlah_kota; i++) {
@@ -55,7 +55,7 @@ void Menghitung_jarak_terpendek(double graph[N][N], int start) {
     visited[start] = 1;
 
     // Memanggil fungsi rekursif untuk mencari jalur terpendek
-    Menemukan_rute(graph, curr_path, 0, visited, 1, &min_cost, final_path, start);
+    Menemukan_rute(graph, curr_path, 0, visited, 1, &min, final_path, start);
 
     // Output jalur terpendek
     printf("Jalur terpendek: ");
@@ -64,7 +64,7 @@ void Menghitung_jarak_terpendek(double graph[N][N], int start) {
     }
     printf("%s\n", kota_awal); // Kembali ke kota awal
 
-    printf("Jarak terbaik yang ditemukan adalah: %f km\n", min_cost);
+    printf("Jarak terbaik yang ditemukan adalah: %f km\n", min);
 }
 
 int main() {
@@ -96,10 +96,6 @@ int main() {
     // Parsing data kota dari file
     while (fgets(line, 255, stream)) {
         // Menghapus BOM jika ditemukan
-        if (line[0] == '\xEF' && line[1] == '\xBB' && line[2] == '\xBF') {
-            memmove(line, line + 3, strlen(line) - 2);
-        }
-        
         strcpy(tempLine, line);
         token = strtok(tempLine, ",");
         nama_kota[i] = (char*)malloc(strlen(token) + 1);
@@ -113,7 +109,7 @@ int main() {
 
     // Membuat matriks adjasensi berdasarkan jarak antar kota
     int banyak = i;
-    double adj[N][N]; // Deklarasi matriks adj sebagai double[N][N]
+    double adj[N][N];
 
     // Mengisi matriks adj dengan jarak antar kota
     for (int i = 0; i < jumlah_kota; i++) {
@@ -142,7 +138,7 @@ int main() {
         printf("Nama kota tidak ditemukan\n");
     }
     else{
-        Menghitung_jarak_terpendek(adj, cek);
+        Print_rute(adj, cek);
     }
     clock_t end = clock();
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
