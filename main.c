@@ -21,8 +21,8 @@ void tsp_greedy(){
 
     start = clock();
 
-    int ada = 0 ;
     for (int i = 0 ; i < jumlah_kota ; i++){
+        int ada = 0 ;
         //printf("\nnama kota: %s , kota awal : %s" , nama_kota[i], kota_awal);
         if (strcmp(nama_kota[i] , kota_awal) == 0){
             visited[i] = 1;
@@ -34,11 +34,6 @@ void tsp_greedy(){
             ada = 1;
             break;
         }
-    }
-    
-    if (ada == 0){
-        printf("Kota %s bukan merupakan kota yang ingin dikunjungi" , kota_awal);
-        return;
     }
     jarak = 0;
 
