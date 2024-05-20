@@ -25,7 +25,7 @@ double calculate(float lat1, float lat2, float long1, float long2) {
                  pow(sin(((long2 - long1) / 2.0) * (PI / 180.0)), 2))));
 }
 
-void calculateFitness(struct Route *route, struct City *cities, int jumlah_kota, int startNode) {
+void calculateDistance(struct Route *route, struct City *cities, int jumlah_kota, int startNode) {
     double totalDistance = 0.0;
     for (int i = 0; i < jumlah_kota - 1; ++i) {
         totalDistance += cities[route->path[i]].distance[route->path[i + 1]];
@@ -100,7 +100,7 @@ void genetika(double **adjacent, int jumlah_kota, char **nama_kota, int startNod
             population[i].path[j] = population[i].path[swapIndex];
             population[i].path[swapIndex] = temp;
         }
-        calculateFitness(&population[i], cities, jumlah_kota, startNode);
+        calculateDistance(&population[i], cities, jumlah_kota, startNode);
     }
 
     for (int generation = 0; generation < MAX_GENERATIONS; ++generation) {
@@ -110,7 +110,7 @@ void genetika(double **adjacent, int jumlah_kota, char **nama_kota, int startNod
             struct Route parent2 = findBestRoute(population, jumlah_kota);
             struct Route child = crossover(parent1, parent2, jumlah_kota, startNode);
             mutate(&child, jumlah_kota);
-            calculateFitness(&child, cities, jumlah_kota, startNode);
+            calculateDistance(&child, cities, jumlah_kota, startNode);
             newPopulation[i] = child;
         }
         for (int i = 0; i < POPULATION_SIZE; ++i) {
@@ -135,6 +135,14 @@ void genetika(double **adjacent, int jumlah_kota, char **nama_kota, int startNod
     }
     free(population);
     free(cities);
+    for (int i = 0; i < jumlah_kota; i++) {
+        free(adj[i]);
+        free(nama_kota[i]);
+    }
+    free(adj);
+    free(nama_kota);
+    free(latitude);
+    free(longitude);
 }
 
 
@@ -195,9 +203,7 @@ int main() {
             } else {
                 adj[i][j] = calculate(latitude[i], latitude[j], longitude[i], longitude[j]);
             }
-            printf("%f |", adj[i][j]);
         }
-        printf("\n");
     }
 
     printf("Masukkan Kota Awal: ");
@@ -209,26 +215,17 @@ int main() {
         }
    }
     // Memanggil fungsi untuk menghitung jalur terpendek
-    clock_t begin = clock();
+    clock_t start_time = clock();
     if(startNode == -1){
         printf("Nama kota tidak ditemukan\n");
     }
     else{
         genetika(adj, jumlah_kota, nama_kota, startNode);
     }
-    clock_t end = clock();
-    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("Time elapsed: %f s\n", time_spent);
+    clock_t end_time = clock();
+    double elapsed_time = ((double) (end_time - start_time)) / CLOCKS_PER_SEC;
 
-    for (int i = 0; i < jumlah_kota; i++) {
-        free(adj[i]);
-        free(nama_kota[i]);
-    }
-    free(adj);
-    free(nama_kota);
-    free(latitude);
-    free(longitude);
-
+    printf("Time elapsed: %f s\n", elapsed_time);
     return 0;
 }
 
