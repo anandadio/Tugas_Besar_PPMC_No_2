@@ -11,6 +11,7 @@ extern double jarak_total;
 // Variabel global
 double final_res = INT_MAX;
 double epsilon = 1e-9;
+double last_bound = INT_MAX;
 
 // Fungsi menyalin jalur yang ditempuh
 void copyToFinal(int curr_path[],int final_path[]) {
@@ -51,9 +52,11 @@ void Rec(double **adj, double curr_bound, double curr_weight, int level, int cur
     if (level == jumlah_kota) { // Sudah mencapai level akhir, leaf
         //debug
         //printf("Halo level4\n");
+        
         if (adj[curr_path[level-1]][curr_path[0]] != 0) { // Mengecek kevalidan jalur kembali ke node awal
             double curr_res = curr_weight + adj[curr_path[level-1]][curr_path[0]];
             if (curr_res < final_res-epsilon) {
+                last_bound = curr_bound + adj[curr_path[level-1]][curr_path[0]];
                 //debug
                 //printf("berat = %lf\n",curr_res);
                 copyToFinal(curr_path, final_path);
@@ -80,8 +83,9 @@ void Rec(double **adj, double curr_bound, double curr_weight, int level, int cur
                 //printf("Halo level%d\n",level);
                 curr_bound -= ((secondMin(adj, curr_path[level-1]) + firstMin(adj, i)) / 2.0);
             }
+            curr_bound+=adj[curr_path[level-1]][i];
             //Melanjutkan search, lanjut ke node selanjutnya
-            if ((curr_bound + adj[curr_path[level-1]][i]) < final_res-epsilon) {
+            if ((curr_bound) < last_bound-epsilon) {
                 //debug
                 //printf("to node:%d\n",i);
                 curr_path[level] = i;
