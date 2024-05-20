@@ -71,14 +71,14 @@ void memilihJalur(int node[jumlah_kota], double probabilitas[jumlah_kota], int *
     // fungsi untuk memilih jalur yang akan dilewati
     double random = RandomNumberGenerator();        // generate angka random dari 0.0 sampai 1.0
     double sum = 0.0;
-    for(int k=0; k<jumlah_kota; k++){
-        if(node[k] == -1){
+    for(int i=0; i<jumlah_kota; i++){
+        if(node[i] == -1){
             continue;       // kota yang sudah dilewati
         }
         else{
-            sum += probabilitas[k];
+            sum += probabilitas[i];
             if(sum >= random){
-                *destination = k;        // menyimpan kota yang terpilih untuk dilewati
+                *destination = i;        // menyimpan kota yang terpilih untuk dilewati
                 break;
             }
         }
@@ -99,14 +99,14 @@ void updatePheromone(double pheromone[jumlah_kota][jumlah_kota], int path[jumlah
                     int kotaAsal, int *current, double evaporate, double totalDistance){
     // fungsi untuk update pheromone setelah semut selesai sampai tujuan
     *current = kotaAsal;
-    for(int j=0; j<jumlah_kota; j++){
-        for(int k=0; k<jumlah_kota; k++){
-            if(j == *current && k == path[j]){
-                pheromone[*current][path[j]] = (1.0 - evaporate) * pheromone[*current][path[j]] + (1.0/totalDistance);
-                *current = path[j];
+    for(int i=0; i<jumlah_kota; i++){
+        for(int j=0; j<jumlah_kota; j++){
+            if(i == *current && j == path[i]){
+                pheromone[*current][path[i]] = (1.0 - evaporate) * pheromone[*current][path[i]] + (1.0/totalDistance);
+                *current = path[i];
             }
             else{
-                pheromone[j][k] = (1.0 - evaporate) * pheromone[j][k];      
+                pheromone[i][j] = (1.0 - evaporate) * pheromone[i][j];      
             }
         }
     }
