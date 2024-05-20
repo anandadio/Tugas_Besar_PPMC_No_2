@@ -4,13 +4,13 @@
 #include <math.h>
 #include <time.h>
 
-// extern int i = 0;
 extern char *nama_kota[255];
 extern int jumlah_kota;
 extern char kota_awal[255];
 extern double **adj;
 
 int seachIndex(){
+    // fungsi untuk mencari index dari kota yang diinputkan oleh user
     for(int i=0; i<jumlah_kota; i++){
         if(strcmp(kota_awal, nama_kota[i]) == 0){
             return i;
@@ -19,6 +19,7 @@ int seachIndex(){
 }
 
 double RandomNumberGenerator(){
+    // fungsi untuk mengenerate angka random dari 0.0 sampai 1.0
     int lower_bound = 1;
     int upper_bound = 1000;
     double val = (rand() % (upper_bound - lower_bound + 1) + lower_bound);
@@ -27,13 +28,14 @@ double RandomNumberGenerator(){
 }
 
 void pheromoneMaking(double pheromone[jumlah_kota][jumlah_kota]){
+    // fungsi untuk membuat matriks pheromone
     for(int i=0; i<jumlah_kota; i++){
         for(int j=0; j<jumlah_kota; j++){
             if(i == j){
-                pheromone[i][j] = 0.0;
+                pheromone[i][j] = 0.0;      // mengisi matriks diagonal dengan 0
             }
             else{
-                pheromone[i][j] = 1.0;
+                pheromone[i][j] = 1.0;      // mengisi pheromone tiap jalur dengan initial value 1
             }
         }
     }
@@ -42,32 +44,32 @@ void pheromoneMaking(double pheromone[jumlah_kota][jumlah_kota]){
 void menentukanProbabilitas(double probabilitas[jumlah_kota], int node[jumlah_kota],
                             double pheromone[jumlah_kota][jumlah_kota], int current,
                             float alpha, float beta){
+    // fungsi untuk menghitung probabilitas setiap jalur yang akan dilewati
     // periksa pilihan kota yang belum dilewati
     double penyebut = 0.0;
-    for(int k=0; k<jumlah_kota; k++){
-        if(node[k] == -1){
+    for(int i=0; i<jumlah_kota; i++){
+        if(node[i] == -1){
             continue;       // kota yang sudah dilewati
         }
         else{
-            penyebut += pow(pheromone[current][k],alpha)*pow((1.0/adj[current][k]),beta);    // menjumlahkan semua penyebut
+            penyebut += pow(pheromone[current][i],alpha)*pow((1.0/adj[current][i]),beta);    // menjumlahkan semua penyebut
         }
     }
 
     // menentukan probabilitas
-    for(int k=0; k<jumlah_kota; k++){
-        if(node[k] == -1){
+    for(int i=0; i<jumlah_kota; i++){
+        if(node[i] == -1){
             continue;       // kota yang sudah dilewati
         }
         else{
-            probabilitas[k] = (pow(pheromone[current][k],alpha)*pow((1.0/adj[current][k]),beta))/penyebut;    // menghitung probabilitas tiap jalur
+            probabilitas[i] = (pow(pheromone[current][i],alpha)*pow((1.0/adj[current][i]),beta))/penyebut;    // menghitung probabilitas tiap jalur
         }
     }
 }
 
 void memilihJalur(int node[jumlah_kota], double probabilitas[jumlah_kota], int *destination){
-    // memilih jalur
-    double random = RandomNumberGenerator();
-    // printf("random : %f\n",random);
+    // fungsi untuk memilih jalur yang akan dilewati
+    double random = RandomNumberGenerator();        // generate angka random dari 0.0 sampai 1.0
     double sum = 0.0;
     for(int k=0; k<jumlah_kota; k++){
         if(node[k] == -1){
@@ -86,7 +88,7 @@ void memilihJalur(int node[jumlah_kota], double probabilitas[jumlah_kota], int *
 void updateDistance(int node[jumlah_kota], int *current,
                     int path[jumlah_kota], double *totalDistance, 
                     int destination, int j){
-    // update distance, posisi terkini
+    // update distance setiap melewati kota dan posisi terkini dari semutnya
     *totalDistance += adj[*current][destination];
     path[j] = destination;
     node[destination] = -1;
@@ -95,6 +97,7 @@ void updateDistance(int node[jumlah_kota], int *current,
 
 void updatePheromone(double pheromone[jumlah_kota][jumlah_kota], int path[jumlah_kota],
                     int kotaAsal, int *current, double evaporate, double totalDistance){
+    // fungsi untuk update pheromone setelah semut selesai sampai tujuan
     *current = kotaAsal;
     for(int j=0; j<jumlah_kota; j++){
         for(int k=0; k<jumlah_kota; k++){
@@ -110,6 +113,7 @@ void updatePheromone(double pheromone[jumlah_kota][jumlah_kota], int path[jumlah
 }
 
 int checkPath(int path[jumlah_kota]){
+    // fungsi untuk memeriksa apakah ada kota yang dilwati lebih dari 1 kali
     for(int i=0; i<jumlah_kota; i++){
         int jumlah = 0;
         for(int j=0; j<jumlah_kota; j++){

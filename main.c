@@ -81,6 +81,6 @@ int main(){
     float alpha = 1.0;
     float beta = 1.5;
     float evaporate = 0.4;
-    int iterasi = 500000;
+    int iterasi = 100;
     ACO(alpha, beta, evaporate, iterasi);
 }
